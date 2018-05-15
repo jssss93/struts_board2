@@ -12,7 +12,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.SqlMapClientBuilder;
 import com.opensymphony.xwork2.ActionSupport;
 
-public class WriteAction extends ActionSupport {
+public class writeAction extends ActionSupport {
 	public static Reader reader;
 	public static SqlMapClient sqlMapper;
 
@@ -36,7 +36,7 @@ public class WriteAction extends ActionSupport {
 	private String uploadFileName;
 	private String fileUploadPath = "C:\\upload\\";
 
-	public WriteAction() throws IOException {
+	public writeAction() throws IOException {
 		reader = Resources.getResourceAsReader("sqlMapConfig.xml");
 		sqlMapper = SqlMapClientBuilder.buildSqlMapClient(reader);
 		reader.close();

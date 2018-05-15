@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>스트럿츠2 게시판</title>
-<link rel="stylesheet" href="/StrutsBoard/board/common/css/css.css"
+<link rel="stylesheet" href="/struts_board1/board/common/css/css.css"
 	type="text/css">
 
 <SCRIPT type="text/javascript">
