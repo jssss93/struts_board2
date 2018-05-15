@@ -23,7 +23,7 @@ public class pagingAction {
 		//전체 페이지수 
 		totalPage=(int)Math.ceil((double) totalCount/blockCount);
 		if(totalPage==0) {
-			totalPage=-1;
+			totalPage=1;
 		}
 		
 		//현재 페이지가 전체 페이지수보다 크면 전체 페이지 수로 설정 
