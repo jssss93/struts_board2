@@ -2,5 +2,17 @@
 <!DOCTYPE struts PUBLIC
     "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
     "http://struts.apache.org/dtds/struts-2.0.dtd">
-<struts></struts>
+<struts>
+	<package name="write" extends="struts-default">
+		<action name="writeForm" class="board.writeAction" method="form">
+			<result>/board/boardWrite.jsp</result>
+		</action>
+
+		<action name="writeAction" class="board.writeAction">
+			<result type="redirect-action">
+				<param name="actionName">listAction</param>
+			</result>
+		</action>
+	</package>
+</struts>
 
