@@ -45,8 +45,7 @@
 			<td align="center"><h2>스트럿츠2 게시판</h2></td>
 		</tr>
 	</table>
-	//글입력과 수정을 같이할거다라는 부분을 이프엘스문으로 처리 //커스텀태그에서 jstl 과 다른점은 if 와 else 가 있다
-	라는정도
+	
 
 	<s:if test="resultClass == NULL">
 		<form action="writeAction.action" method="post"

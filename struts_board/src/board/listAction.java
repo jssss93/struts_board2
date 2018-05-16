@@ -37,6 +37,9 @@ public class listAction extends ActionSupport{
 	}
 	
 	public String execute() throws Exception{
+		
+		System.out.println("tests");
+		
 		// 모든 글을 가져와 list에 넣는다.
 		list=sqlMapper.queryForList("selectAll");
 		
@@ -47,7 +50,7 @@ public class listAction extends ActionSupport{
 		page=new pagingAction(currentPage, totalCount, blockCount, blockPage);
 		pagingHtml=page.getPagingHtml().toString();// 페이지 HTML 생성.
 		
-		// 현재 페이지에서 보여줄 마지막 글의 번호 설정.
+		// 현재 페이지에`서 보여줄 마지막 글의 번호 설정.
 		int lastCount=totalCount;
 		
 		// 현재 페이지의 마지막 글의 번호가 전체의 마지막 글 번호보다 작으면 
