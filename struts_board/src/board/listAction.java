@@ -37,9 +37,7 @@ public class listAction extends ActionSupport{
 	}
 	
 	public String execute() throws Exception{
-		
-		System.out.println("tests");
-		
+			
 		// 모든 글을 가져와 list에 넣는다.
 		list=sqlMapper.queryForList("selectAll");
 		
