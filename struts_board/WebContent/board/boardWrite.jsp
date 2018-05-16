@@ -9,34 +9,34 @@
 <link rel="stylesheet" href="/struts_board1/board/common/css/css.css"
 	type="text/css">
 
-<SCRIPT type="text/javascript">
-	function validation() {
+	<SCRIPT type="text/javascript">
+		function validation() {
 
-		var frm = document.forms(0);
+			var frm = document.forms(0);
 
-		if (frm.subject.value == "") {
-			alert("제목을 입력해주세요.");
-			return false;
+			if (frm.subject.value == "") {
+				alert("제목을 입력해주세요.");
+				return false;
+			}
+
+			else if (frm.name.value == "") {
+				alert("이름을 입력해주세요.");
+				return false;
+			}
+
+			else if (frm.password.value == "") {
+				alert("비밀번호를 입력해주세요.");
+				return false;
+			}
+
+			else if (frm.content.value == "") {
+				alert("내용을 입력해주세요.");
+				return false;
+			}
+
+			return true;
 		}
-
-		else if (frm.name.value == "") {
-			alert("이름을 입력해주세요.");
-			return false;
-		}
-
-		else if (frm.password.value == "") {
-			alert("비밀번호를 입력해주세요.");
-			return false;
-		}
-
-		else if (frm.content.value == "") {
-			alert("내용을 입력해주세요.");
-			return false;
-		}
-
-		return true;
-	}
-</SCRIPT>
+	</SCRIPT>
 </head>
 
 <body>
@@ -131,9 +131,8 @@
 		<tr>
 			<td align="right" colspan="2"><input name="submit" type="submit"
 				value="작성완료" class="inputb"> <input name="list"
-				type="button" value="목록" class="inputb"
-				onClick="javascript:location.href='listAction.action?currentPage=<s:property value="currentPage" />'">
-			</td>
+					type="button" value="목록" class="inputb"
+					onClick="javascript:location.href='listAction.action?currentPage=<s:property value="currentPage" />'"></td>
 		</tr>
 
 	</table>
