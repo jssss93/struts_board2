@@ -70,6 +70,22 @@
 		</tr>
 
 		<tr align="right">
+
+
+			<%
+				//검색
+			%>
+			<td colspan="5">
+				<form action="listAction.action" name="searchKeyword">
+					<select name="Opt">
+						<option value="subject">제목</option>
+						<option value="content">내용</option>
+					</select> 
+					<input type="text" name="Keyword"> <input type="submit"	value="검색">
+
+
+				</form>
+			</td>
 			<td colspan="5"><input type="button" value="글쓰기" class="inputb"
 				onClick="javascript:location.href='writeForm.action?currentPage=<s:property value="currentPage" />';">
 			</td>

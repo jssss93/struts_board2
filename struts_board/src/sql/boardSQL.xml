@@ -6,6 +6,7 @@
 
 	<!-- 리절트 맵 정의 -->
 	<resultMap id="boardRes" class="board">
+
 		<result property="no" column="no" />
 		<result property="subject" column="subject" />
 		<result property="name" column="name" />
@@ -15,7 +16,16 @@
 		<result property="file_savname" column="file_savName" />
 		<result property="readhit" column="readhit" />
 		<result property="regdate" column="regdate" />
+
 	</resultMap>
+
+
+
+	<!-- search_subject -->
+	<!-- <sql id="s"> SELECT * FROM SBOARD_3T_1 WHERE #opt# LIKE '%'||#{keyword}||'%' 
+		</sql> -->
+
+
 
 	<!-- 공통으로 사용할 select 절 정의 -->
 	<sql id="select-all">
@@ -26,6 +36,7 @@
 	<sql id="where-no">
 		WHERE no = #no#
 	</sql>
+
 
 
 	<!-- select 쿼리문 정의 -->
@@ -48,6 +59,19 @@
 		<include refid="select-all" />
 		<include refid="where-no" />
 		AND password = #password#
+	</select>
+
+	<!-- 검색 -->
+	<select id="search_subject" resultMap="boardRes" parameterClass="String">
+		<include refid="select-all" />
+		WHERE subject like #Keyword#
+		ORDER BY no DESC
+	</select>
+
+	<select id="search_content" resultMap="boardRes" parameterClass="String">
+		<include refid="select-all" />
+		WHERE content like #Keyword#
+		ORDER BY no DESC
 	</select>
 
 

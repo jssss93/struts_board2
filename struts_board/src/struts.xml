@@ -16,6 +16,7 @@
 		<action name="listAction" class="board.listAction">
 			<result>/board/boardList.jsp</result>
 		</action>
+		
 	</package>
 
 

@@ -9,57 +9,89 @@ import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.SqlMapClientBuilder;
 import com.opensymphony.xwork2.ActionSupport;
+import com.sun.org.apache.xpath.internal.compiler.Keywords;
 
-public class listAction extends ActionSupport{
-	
-	public static Reader reader; // ÆÄÀÏ ½ºÆ®¸²À» À§ÇÑ reader.
-	public static SqlMapClient sqlMapper; //SqlMapClient API¸¦ »ç¿ëÇÏ±â À§ÇÑ sqlMapper °´Ã¼.
-	
-	private List<boardVO> list =new ArrayList<boardVO>();
-	
-	private int currentPage=1;//ÇöÀç ÆäÀÌÁö
-	private int totalCount; // ÃÑ °Ô½Ã¹°ÀÇ ¼ö
-	private int blockCount =10;// ÇÑ ÆäÀÌÁöÀÇ  °Ô½Ã¹°ÀÇ ¼ö
-	private int blockPage=5;// ÇÑ È­¸é¿¡ º¸¿©ÁÙ ÆäÀÌÁö ¼ö
-	private String pagingHtml;//ÆäÀÌÂ¡À» ±¸ÇöÇÑ HTML
-	private pagingAction page;// ÆäÀÌÂ¡ Å¬·¡½º
-	
+//ìŠ¤íŠ¸ëŸ¬ì¸ ë¼ëŠ”ê±¸ ìŠì§€ë§ê³  ì•¡ì…˜ì„œí¬íŠ¸ë¥¼ ìƒì†ë°›ì•„ ì‚¬ìš©
+public class listAction extends ActionSupport {
 
-	//»ı¼ºÀÚ 
-	public listAction() throws IOException{
-		//sqlMapConfig.xml ÆÄÀÏÀÇ ¼³Á¤³»¿ëÀ» °¡Á®¿Â´Ù.
-		reader=Resources.getResourceAsReader("sqlMapConfig.xml");
-		
-		//sqlMapConfig.xmlÀÇ ³»¿ëÀ» Àû¿ëÇÑ sqlMapper °´Ã¼ »ı¼º.
-		sqlMapper=SqlMapClientBuilder.buildSqlMapClient(reader);
-		
+	public static Reader reader; // íŒŒì¼ ìŠ¤íŠ¸ë¦¼ì„ ìœ„í•œ reader.>>boardSQL.xml ì— ì„¤ì •í•´ì¤€ ê²ƒë“¤ ì½ì–´ì˜¤ê¸°ìœ„í•´
+	public static SqlMapClient sqlMapper; // SqlMapClient APIë¥¼ ì‚¬ìš©í•˜ê¸° ìœ„í•œ sqlMapper ê°ì²´.
+
+	// ë„í¬ì¸íŠ¸ ìµì…‰ì…˜ì€ ì„ ì–¸ë§Œí•˜ê³  ì‚¬ìš©í•˜ì§€ì•Šì•˜ì„ê²½ìš° ì•ˆì˜ë‚´ìš©ì´ì•ˆì°¨ì„œ ì˜¤ë¥˜ëœ¨ëŠ”ê±°ì•¼
+
+	private List<boardVO> list = new ArrayList<boardVO>();;
+
+	private int currentPage = 1; // í˜„ì¬ í˜ì´ì§€
+	private int totalCount; // ì´ ê²Œì‹œë¬¼ì˜ ìˆ˜
+	private int blockCount = 10; // í•œ í˜ì´ì§€ì˜ ê²Œì‹œë¬¼ì˜ ìˆ˜
+	private int blockPage = 5; // í•œ í™”ë©´ì— ë³´ì—¬ì¤„ í˜ì´ì§€ ìˆ˜
+	private String pagingHtml; // í˜ì´ì§•ì„ êµ¬í˜„í•œ HTML
+	private pagingAction page; // í˜ì´ì§• í´ë˜ìŠ¤
+
+	// ê²€ìƒ‰ì„ìœ„í•œ ê°ì²´ ì„ ì–¸
+	private String Keyword;
+
+	private String Opt;
+
+	// ìƒì„±ì >>>boardSQL.xml ì„ ì‚¬ìš©í•˜ê¸°ìœ„í•´
+	public listAction() throws IOException {
+
+		reader = Resources.getResourceAsReader("sqlMapConfig.xml"); // sqlMapConfig.xml íŒŒì¼ì˜ ì„¤ì •ë‚´ìš©ì„ ê°€ì ¸ì˜¨ë‹¤.
+		sqlMapper = SqlMapClientBuilder.buildSqlMapClient(reader); // sqlMapConfig.xmlì˜ ë‚´ìš©ì„ ì ìš©í•œ sqlMapper ê°ì²´ ìƒì„±.
 		reader.close();
 	}
-	
-	public String execute() throws Exception{
-		// ¸ğµç ±ÛÀ» °¡Á®¿Í list¿¡ ³Ö´Â´Ù.
-		list=sqlMapper.queryForList("selectAll");
-		
-		// ÀüÃ¼ ±Û °¹¼ö¸¦ ±¸ÇÑ´Ù.
-		totalCount=list.size();
-		
-		// pagingAction °´Ã¼ »ı¼º.
-		page=new pagingAction(currentPage, totalCount, blockCount, blockPage);
-		pagingHtml=page.getPagingHtml().toString();// ÆäÀÌÁö HTML »ı¼º.
-		
-		// ÇöÀç ÆäÀÌÁö¿¡¼­ º¸¿©ÁÙ ¸¶Áö¸· ±ÛÀÇ ¹øÈ£ ¼³Á¤.
-		int lastCount=totalCount;
-		
-		// ÇöÀç ÆäÀÌÁöÀÇ ¸¶Áö¸· ±ÛÀÇ ¹øÈ£°¡ ÀüÃ¼ÀÇ ¸¶Áö¸· ±Û ¹øÈ£º¸´Ù ÀÛÀ¸¸é 
-		//lastCount¸¦ +1 ¹øÈ£·Î ¼³Á¤.s
-		if(page.getEndCount()<totalCount) {
-			lastCount=page.getEndCount()+1;
+
+	// ê²Œì‹œíŒ LIST ì•¡ì…˜
+	public String execute() throws Exception {
+		//í•œê¸€ê°’ë„ ê²€ìƒ‰ë˜ê²Œë” ì„¤ì •??í•œê¸€ì„¤ì • ì–´ì¼€í•˜ë‹ˆ
+		/*Keyword = new String(Keyword.getBytes("iso-8859-1"), "euc-kr");*/
+
+		// ê²€ìƒ‰ì˜µì…˜ì´ ì„ íƒë˜ì§€ì•Šìœ¼ë©´
+		if (Opt == null) {
+			// ì „ì²´ ë¦¬ìŠ¤íŠ¸ ì¶œë ¥
+			list = sqlMapper.queryForList("selectAll");
+			// ê²€ìƒ‰ëœê²ƒì„ ë¦¬ìŠ¤íŠ¸ì—ì„œ ì¶œë ¥
+		} else if (Opt.equals("subject")) {
+			list = sqlMapper.queryForList("search_subject", '%' + getKeyword() + '%');
+		} else if (Opt.equals("content")) {
+			list = sqlMapper.queryForList("search_content", '%' + getKeyword() + '%');
 		}
-		
-		// ÀüÃ¼ ¸®½ºÆ®¿¡¼­ ÇöÀç ÆäÀÌÁö¸¸Å­ÀÇ ¸®½ºÆ®¸¸ °¡Á®¿Â´Ù.
-		list=list.subList(page.getStartCount(), lastCount);
+		totalCount = list.size(); // ì „ì²´ ê¸€ ê°¯ìˆ˜ë¥¼ êµ¬í•œë‹¤.
+		// pagingAction ê°ì²´ ìƒì„±.
+		page = new pagingAction(currentPage, totalCount, blockCount, blockPage);
+		pagingHtml = page.getPagingHtml().toString(); // í˜ì´ì§€ HTML ìƒì„±.
+
+		// í˜„ì¬ í˜ì´ì§€ì—ì„œ ë³´ì—¬ì¤„ ë§ˆì§€ë§‰ ê¸€ì˜ ë²ˆí˜¸ ì„¤ì •.
+		int lastCount = totalCount;
+
+		// í˜„ì¬ í˜ì´ì§€ì˜ ë§ˆì§€ë§‰ ê¸€ì˜ ë²ˆí˜¸ê°€ ì „ì²´ì˜ ë§ˆì§€ë§‰ ê¸€ ë²ˆí˜¸ë³´ë‹¤ ì‘ìœ¼ë©´
+		// lastCountë¥¼ +1 ë²ˆí˜¸ë¡œ ì„¤ì •.
+		if (page.getEndCount() < totalCount)
+			lastCount = page.getEndCount() + 1;
+
+		// ì „ì²´ ë¦¬ìŠ¤íŠ¸ì—ì„œ í˜„ì¬ í˜ì´ì§€ë§Œí¼ì˜ ë¦¬ìŠ¤íŠ¸ë§Œ ê°€ì ¸ì˜¨ë‹¤.
+		list = list.subList(page.getStartCount(), lastCount);
+
 		return SUCCESS;
 	}
+
+	// ê²€ìƒ‰ì„ìœ„í•œ ê²Ÿì…‹------------------------------------------------
+	public String getKeyword() {
+		return Keyword;
+	}
+
+	public void setKeyword(String Keyword) {
+		this.Keyword = Keyword;
+	}
+
+	public String getOpt() {
+		return Opt;
+	}
+
+	public void setOpt(String Opt) {
+		this.Opt = Opt;
+	}
+	// -----------------------------------------------------------
 
 	public List<boardVO> getList() {
 		return list;
@@ -116,6 +148,4 @@ public class listAction extends ActionSupport{
 	public void setPage(pagingAction page) {
 		this.page = page;
 	}
-	
-	
 }
