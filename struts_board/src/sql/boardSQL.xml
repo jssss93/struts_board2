@@ -3,6 +3,7 @@
 <sqlMap>
 
 	<typeAlias alias="board" type="board.boardVO" />
+	<typeAlias alias="cboard" type="board.cboardVO" />
 
 	<!-- 리절트 맵 정의 -->
 	<resultMap id="boardRes" class="board">
@@ -16,20 +17,31 @@
 		<result property="file_savname" column="file_savName" />
 		<result property="readhit" column="readhit" />
 		<result property="regdate" column="regdate" />
+		<result property="ref" column="ref" />
+		<result property="re_step" column="re_step" />
+		<result property="re_level" column="re_level" />
+
+	</resultMap>
+
+	<resultMap id="boardCom" class="cboard">
+		<result property="no" column="no" />
+		<result property="originno" column="originno" />
+		<result property="name" column="name" />
+		<result property="password" column="password" />
+		<result property="content" column="content" />
+		<result property="regdate" column="regdate" />
 
 	</resultMap>
 
 
-
 	<!-- search_subject -->
-	<!-- <sql id="s"> SELECT * FROM SBOARD_3T_1 WHERE #opt# LIKE '%'||#{keyword}||'%' 
-		</sql> -->
+	<!-- SELECT * FROM SBOARD_3T_1 WHERE #Opt# LIKE '%'||#Keyword#||'%' -->
 
 
 
 	<!-- 공통으로 사용할 select 절 정의 -->
 	<sql id="select-all">
-		SELECT * FROM SBOARD_3T_1
+		SELECT * FROM SBOARD2_CJS
 	</sql>
 
 	<!-- 공통으로 사용할 where-no 절 정의 -->
@@ -40,9 +52,9 @@
 
 
 	<!-- select 쿼리문 정의 -->
-	<select id="selectAll" resultMap="boardRes">
+	<select id="selectAll" resultMap="boardRes" parameterClass="int">
 		<include refid="select-all" />
-		ORDER BY no DESC
+		ORDER BY no DESC ,re_step asc
 	</select>
 
 	<select id="selectOne" resultMap="boardRes" parameterClass="int">
@@ -52,7 +64,7 @@
 
 	<select id="selectLastNo" resultClass="board">
 		SELECT max(no) as no FROM
-		SBOARD_3T_1
+		SBOARD2_CJS
 	</select>
 
 	<select id="selectPassword" resultMap="boardRes" parameterClass="board">
@@ -73,33 +85,92 @@
 		WHERE content like #Keyword#
 		ORDER BY no DESC
 	</select>
+	<!-- comment 리스트 불러오기 -->
+	<select id="select_comment" resultMap="boardCom" parameterClass="int">
+		select * from boardc_cjs where originno = #no# order by no desc
+	</select>
 
-
+	
+	
 	<!-- insert 쿼리문 정의 -->
+	<!-- 게시판 insert -->
 	<insert id="insertBoard" parameterClass="board">
 
-		INSERT INTO SBOARD_3T_1
+		INSERT INTO SBOARD2_CJS
 		(NO,
 		SUBJECT,
 		NAME,
 		PASSWORD,
 		CONTENT,
-		REGDATE
+		REGDATE,
+		REF,
+		RE_STEP,
+		RE_LEVEL
 		)
 		VALUES
-		(SBOARD_NO_SEQ_3T_1.NEXTVAL,
+		(sboard2_no_seq_cjs.NEXTVAL,
 		#subject#,
 		#name#,
 		#password#,
 		#content#,
+		#regdate#,
+		SBOARD2_NO_SEQ_cjs.CURRVAL,
+		#re_step#,
+		#re_level#
+
+		)
+	</insert>
+	<!-- 답변 insert -->
+	<insert id="insertBoardReply" parameterClass="board">
+		INSERT INTO
+		SBOARD2_cjs
+		(NO,
+		SUBJECT,
+		NAME,
+		PASSWORD,
+		CONTENT,
+		REGDATE,
+		RE_STEP,
+		RE_LEVEL,
+		REF)
+		VALUES (
+		SBOARD2_NO_SEQ_cjs.NEXTVAL,
+		#subject#,
+		#name#,
+		#password#,
+		#content#,
+		#regdate#,
+		#re_step#,
+		#re_level#,
+		#ref#
+
+		)
+	</insert>
+	<!-- 댓글 insert -->
+	<insert id="insertBoardComment" parameterClass="cboard">
+		INSERT INTO
+		BOARDc_cjs
+		(NO,
+		originno,
+		NAME,
+		PASSWORD,
+		CONTENT,
+		REGDATE
+		)
+		VALUES (
+		boardc_no_seq_cjs.nextval,
+		#no#,
+		#name#,
+		#password#,
+		#content#,
 		#regdate#
+
 		)
 	</insert>
 
-
 	<!-- update 쿼리문 정의 -->
 	<update id="updateBoard" parameterClass="board">
-		UPDATE SBOARD_3T_1 SET SUBJECT = #subject#,
+		UPDATE SBOARD2_CJS SET SUBJECT = #subject#,
 		NAME = #name#,
 		PASSWORD =
 		#password#,
@@ -108,21 +179,27 @@
 	</update>
 
 	<update id="updateFile" parameterClass="board">
-		UPDATE SBOARD_3T_1 SET FILE_ORGNAME = #file_orgname#
+		UPDATE SBOARD2_CJS SET FILE_ORGNAME = #file_orgname#
 		,FILE_SAVNAME =
 		#file_savname#
 		<include refid="where-no" />
 	</update>
 
 	<update id="updateReadHit" parameterClass="board">
-		UPDATE SBOARD_3T_1 SET READHIT = readHit + 1
+		UPDATE SBOARD2_CJS SET READHIT = readHit + 1
 		<include refid="where-no" />
+	</update>
+
+	<update id="updateReplyStep" parameterClass="board">
+		UPDATE SBOARD2_CJS
+		SET re_step=re_step+1 WHERE ref=#ref# AND re_step>#re_step#
+
 	</update>
 
 
 	<!-- delete 쿼리문 정의 -->
 	<delete id="deleteBoard" parameterClass="board">
-		DELETE FROM SBOARD_3T_1
+		DELETE FROM SBOARD2_CJS
 		<include refid="where-no" />
 	</delete>
 

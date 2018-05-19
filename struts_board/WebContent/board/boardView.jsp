@@ -13,7 +13,7 @@
 			function open_win_noresizable(url, name) {
 				var oWin = window
 						.open(url, name,
-								"scrollbars=no,status=no,resizable=no,width=300,height=150");
+								"scrollbars=no,status=no,resizable=no,width=700,height=400");
 
 			}
 		</script>
@@ -108,10 +108,66 @@
 				</s:a>
 			</td>
 		</tr>
+		<!-- 코멘트 ----------------------------------------------------------------------------------------------------------- -->
+		<tr bgcolor="#777777">
+			<td colspan="2" height="1"></td>
+		</tr>
+		<tr>
+			<td colspan="2" height="10"></td>
+		</tr>
+		<tr>
+			<td colspan="2" height="10">
+				<form action="writeCommentAction.action" method="post">
+					<table>
+						<tr>
+							<td width="170">이&nbsp;&nbsp;&nbsp;&nbsp;름 <s:textfield
+									name="name" theme="simple" value="" cssStyle="width:100px"
+									maxlength="20" /><br> 비밀번호 <s:textfield name="password"
+										theme="simple" value="" cssStyle="width:100px" maxlength="20" /></td>
+							<s:hidden name="originno" value="%{resultClass.no}" />
+							<s:hidden name="no" value="%{resultClass.no}" />
+							<s:hidden name="currentPage" value="%{currentPage}" />
+							<td align="left"><s:textarea name="content" theme="simple"
+									value="" cols="60" rows="3" /></td>
+						</tr>
+						<tr>
+							<td colspan="2" align="right"><input name="submit"
+								type="submit" value="작성완료" class="inputb"></td>
+						</tr>
+					</table>
+				</form>
+			</td>
+		</tr>
+
+		<tr bgcolor="#777777">
+			<td colspan="2" height="1"></td>
+		</tr>
+
+		<!--  코멘트 리스트 띠우기 시작 -->
+		<s:iterator value="list_c" status="stat">
+			<tr>
+				<td height="10" width="130" align="center"><s:property
+						value="name" /><br> <s:property value="regdate" /><br><br></td>
+				<td>
+					<!-- @@@@@@@@@@@@코멘트 삭제@@@@@@@@@@@@ --> <s:property value="content" />
+					<a
+					href="javascript:open_win_noresizable('checkForm2.action?no=<s:property value="no" />&originno=<s:property value="originno" />&currentPage=<s:property value="currentPage" />','cdelete')">x</a>
+				</td>
+			</tr>
+			<tr bgcolor="#777777">
+				<td colspan="2" height="1"></td>
+			</tr>
+		</s:iterator>
+		<tr>
+			<td colspan="2" height="10"><s:if test="list_c.size() <= 0">
+				댓글없음
+			</td>
+		</tr>
+		</s:if>
 		<tr bgcolor="#777777">
 			<td height="1" colspan="2"></td>
 		</tr>
-
+		<!--  -->
 		<tr>
 			<td height="10" colspan="2"></td>
 		</tr>
@@ -127,14 +183,16 @@
 					<s:param name="no">
 						<s:property value="no" />
 					</s:param>
-				</s:url> <input name="list" type="button" value="수정" class="inputb"
-				onClick="javascript:open_win_noresizable('checkForm.action?no=<s:property value="resultClass.no" />&currentPage=<s:property value="currentPage" />','modify')">
+				</s:url> <input name="list" type="button" value="답변달기" class="inputb"
+				onClick="javascript:location.href='replyForm.action?no=<s:property value="no" />&currentPage=<s:property value="currentPage" />'"><input
+					name="list" type="button" value="수정" class="inputb"
+					onClick="javascript:open_win_noresizable('checkForm.action?no=<s:property value="resultClass.no" />&currentPage=<s:property value="currentPage" />','modify')">
 
-					<input name="list" type="button" value="삭제" class="inputb"
-					onClick="javascript:open_win_noresizable('checkForm.action?no=<s:property value="resultClass.no" />&currentPage=<s:property value="currentPage" />','delete')">
+						<input name="list" type="button" value="삭제" class="inputb"
+						onClick="javascript:open_win_noresizable('checkForm.action?no=<s:property value="resultClass.no" />&currentPage=<s:property value="currentPage" />','delete')">
 
-						<input name="list" type="button" value="목록" class="inputb"
-						onClick="javascript:location.href='listAction.action?currentPage=<s:property value="currentPage" />'"></td>
+							<input name="list" type="button" value="목록" class="inputb"
+							onClick="javascript:location.href='listAction.action?currentPage=<s:property value="currentPage" />'"></td>
 		</tr>
 
 	</table>

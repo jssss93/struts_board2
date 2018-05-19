@@ -16,12 +16,13 @@
 		<action name="listAction" class="board.listAction">
 			<result>/board/boardList.jsp</result>
 		</action>
-		
+
 	</package>
 
 
 
 	<package name="write--------------------" extends="struts-default">
+
 		<action name="writeForm" class="board.writeAction" method="form">
 			<result>/board/boardWrite.jsp</result>
 		</action>
@@ -31,14 +32,33 @@
 				<param name="actionName">listAction</param>
 			</result>
 		</action>
+
+		<action name="writeCommentAction" class="board.writeCommentAction">
+			<result type="chain">viewAction</result>
+		</action>
+
 	</package>
 
 
 
 	<package name="view-----------------" extends="struts-default">
+
 		<action name="viewAction" class="board.viewAction">
 			<result>/board/boardView.jsp</result>
 		</action>
+
+
+		<!-- 답변기능 >>>>write 할때 썻던 폼으로 사용 -->
+		<action name="replyForm" class="board.writeAction" method="reply">
+			<result type="chain">writeForm</result>
+		</action>
+		<action name="replyAction" class="board.writeAction">
+			<result type="redirect-action">
+				<param name="actionName">listAction</param>
+			</result>
+		</action>
+		<!-- 여기까지 답변기능 -->
+
 
 		<!-- 파일 다운로드 액션. -->
 		<action name="fileDownloadAction" class="board.viewAction"
@@ -51,7 +71,42 @@
 				<param name="bufferSize">4096</param>
 			</result>
 		</action>
+
+
+		<!-- 게시판 수정 액션 -->
+		<action name="modifyForm" class="board.viewAction">
+			<result type="chain">writeForm</result>
+		</action>
+
+		<action name="modifyAction" class="board.modifyAction">
+			<result type="chain">viewAction</result>
+		</action>
+		<!-- 비밀번호 체크액션 -->
+		<action name="checkForm" class="board.viewAction" method="checkForm">
+			<result>/board/checkPassword.jsp</result>
+		</action>
+
+		<action name="checkAction" class="board.viewAction" method="checkAction">
+			<result name="error">/board/checkError.jsp</result>
+			<result>/board/checkSuccess.jsp</result>
+		</action>
+
+		<action name="checkForm2" class="board.viewAction" method="checkForm">
+			<result>/board/checkPassword2.jsp</result>
+		</action>
+		<action name="checkAction2" class="board.viewAction" method="checkAction2">
+			<result name="error">/board/checkError.jsp</result>
+			<result>/board/checkSuccess.jsp</result>
+		</action>
+
+
 	</package>
+
+
+
+
+
+
 
 </struts>
 

@@ -1,18 +1,19 @@
 package board;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.Calendar;
-
-import org.apache.commons.io.FileUtils;
-
+import com.opensymphony.xwork2.ActionSupport;
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.SqlMapClientBuilder;
-import com.opensymphony.xwork2.ActionSupport;
+
+import java.util.*;
+import java.io.Reader;
+import java.io.IOException;
+
+import java.io.File;
+import org.apache.commons.io.FileUtils;
 
 public class writeAction extends ActionSupport {
+
 	public static Reader reader;
 	public static SqlMapClient sqlMapper;
 
@@ -28,7 +29,6 @@ public class writeAction extends ActionSupport {
 	private String content;
 	private String file_orgName;
 	private String file_savName;
-
 	Calendar today = Calendar.getInstance();
 
 	private File upload;
@@ -36,52 +36,89 @@ public class writeAction extends ActionSupport {
 	private String uploadFileName;
 	private String fileUploadPath = "C:\\upload\\";
 
+	private int ref;
+	private int re_step;
+	private int re_level;
+
+	boolean reply = false;
+
 	public writeAction() throws IOException {
 		reader = Resources.getResourceAsReader("sqlMapConfig.xml");
 		sqlMapper = SqlMapClientBuilder.buildSqlMapClient(reader);
 		reader.close();
+
 	}
 
 	public String form() throws Exception {
 		return SUCCESS;
+
+	}
+
+	public String reply() throws Exception {
+		reply = true;
+		resultClass = new boardVO();
+
+		resultClass = (boardVO) sqlMapper.queryForObject("selectOne", getNo());
+		resultClass.setSubject("[답변달기] " + resultClass.getSubject());
+		resultClass.setPassword("");
+		resultClass.setName("");
+		resultClass.setContent("");
+		resultClass.setFile_orgname(null);
+		resultClass.setFile_savname(null);
+
+		return SUCCESS;
+
 	}
 
 	public String execute() throws Exception {
+
 		paramClass = new boardVO();
 		resultClass = new boardVO();
+
+		if (ref == 0) {
+			paramClass.setRe_step(0);
+			paramClass.setRe_level(0);
+
+		} else {
+
+			paramClass.setRef(getRef());
+			paramClass.setRe_step(getRe_step());
+			sqlMapper.update("updateReplyStep", paramClass);
+
+			paramClass.setRe_step(getRe_step() + 1);
+			paramClass.setRe_level(getRe_level() + 1);
+			paramClass.setRef(getRef());
+		}
 
 		paramClass.setSubject(getSubject());
 		paramClass.setName(getName());
 		paramClass.setPassword(getPassword());
 		paramClass.setContent(getContent());
 		paramClass.setRegdate(today.getTime());
-		
-		sqlMapper.insert("insertBoard", paramClass);
-		
-		if(getUpload()!=null) {
-			resultClass=(boardVO) sqlMapper.queryForObject("selectLastNo");
-			String file_name ="file_"+ resultClass.getNo();
-			String file_ext=getUploadFileName().substring(getUploadFileName().lastIndexOf('.')+1,
+
+		if (ref == 0)
+			sqlMapper.insert("insertBoard", paramClass);
+		else
+			sqlMapper.insert("insertBoardReply", paramClass);
+
+		if (getUpload() != null) {
+			resultClass = (boardVO) sqlMapper.queryForObject("selectLastNo");
+
+			String file_name = "file_" + resultClass.getNo();
+			String file_ext = getUploadFileName().substring(getUploadFileName().lastIndexOf('.') + 1,
 					getUploadFileName().length());
-			
-			File destFile=new File(fileUploadPath+file_name+"."+file_ext);
+
+			File destFile = new File(fileUploadPath + file_name + "." + file_ext);
 			FileUtils.copyFile(getUpload(), destFile);
-			
+
 			paramClass.setNo(resultClass.getNo());
 			paramClass.setFile_orgname(getUploadFileName());
-			paramClass.setFile_savname(file_name+"."+file_ext);
-			
-			sqlMapper.update("updateFile",paramClass);
+			paramClass.setFile_savname(file_name + "." + file_ext);
+
+			sqlMapper.update("updateFile", paramClass);
 		}
+
 		return SUCCESS;
-	}
-
-	public Calendar getToday() {
-		return today;
-	}
-
-	public void setToday(Calendar today) {
-		this.today = today;
 	}
 
 	public boardVO getParamClass() {
@@ -92,12 +129,28 @@ public class writeAction extends ActionSupport {
 		this.paramClass = paramClass;
 	}
 
-	public String getName() {
-		return name;
+	public boardVO getResultClass() {
+		return resultClass;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setResultClass(boardVO resultClass) {
+		this.resultClass = resultClass;
+	}
+
+	public int getCurrentPage() {
+		return currentPage;
+	}
+
+	public void setCurrentPage(int currentPage) {
+		this.currentPage = currentPage;
+	}
+
+	public int getNo() {
+		return no;
+	}
+
+	public void setNo(int no) {
+		this.no = no;
 	}
 
 	public String getSubject() {
@@ -106,6 +159,14 @@ public class writeAction extends ActionSupport {
 
 	public void setSubject(String subject) {
 		this.subject = subject;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getPassword() {
@@ -122,6 +183,30 @@ public class writeAction extends ActionSupport {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public String getFile_orgName() {
+		return file_orgName;
+	}
+
+	public void setFile_orgName(String fileOrgName) {
+		file_orgName = fileOrgName;
+	}
+
+	public String getFile_savName() {
+		return file_savName;
+	}
+
+	public void setFile_savName(String fileSavName) {
+		file_savName = fileSavName;
+	}
+
+	public Calendar getToday() {
+		return today;
+	}
+
+	public void setToday(Calendar today) {
+		this.today = today;
 	}
 
 	public File getUpload() {
@@ -156,43 +241,36 @@ public class writeAction extends ActionSupport {
 		this.fileUploadPath = fileUploadPath;
 	}
 
-	public int getNo() {
-		return no;
+	public boolean isReply() {
+		return reply;
 	}
 
-	public void setNo(int no) {
-		this.no = no;
+	public void setReply(boolean reply) {
+		this.reply = reply;
 	}
 
-	public String getFile_orgName() {
-		return file_orgName;
+	public int getRef() {
+		return ref;
 	}
 
-	public void setFile_orgName(String file_orgName) {
-		this.file_orgName = file_orgName;
+	public void setRef(int ref) {
+		this.ref = ref;
 	}
 
-	public String getFile_savName() {
-		return file_savName;
+	public int getRe_step() {
+		return re_step;
 	}
 
-	public void setFile_savName(String file_savName) {
-		this.file_savName = file_savName;
+	public void setRe_step(int reStep) {
+		re_step = reStep;
 	}
 
-	public boardVO getResultClass() {
-		return resultClass;
+	public int getRe_level() {
+		return re_level;
 	}
 
-	public void setResultClass(boardVO resultClass) {
-		this.resultClass = resultClass;
+	public void setRe_level(int reLevel) {
+		re_level = reLevel;
 	}
 
-	public int getCurrentPage() {
-		return currentPage;
-	}
-
-	public void setCurrentPage(int currentPage) {
-		this.currentPage = currentPage;
-	}
 }

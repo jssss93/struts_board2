@@ -9,10 +9,10 @@
 <link rel="stylesheet" href="/struts_board1/board/common/css/css.css"
 	type="text/css">
 
-	<SCRIPT type="text/javascript">
+	<script type="text/javascript">
 		function validation() {
 
-			var frm = document.forms(0);
+			var frm = document.forms[0];
 
 			if (frm.subject.value == "") {
 				alert("제목을 입력해주세요.");
@@ -36,7 +36,11 @@
 
 			return true;
 		}
-	</SCRIPT>
+		//이게뭐냐도데체
+		$(document).ready(function() {
+			$("#content").cleditor();
+		});
+	</script>
 </head>
 
 <body>
@@ -45,13 +49,23 @@
 			<td align="center"><h2>스트럿츠2 게시판</h2></td>
 		</tr>
 	</table>
-	//글입력과 수정을 같이할거다라는 부분을 이프엘스문으로 처리 //커스텀태그에서 jstl 과 다른점은 if 와 else 가 있다
-	라는정도
+	<%
+		//글입력과 수정을 같이할거다라는 부분을 이프엘스문으로 처리
+		//커스텀태그에서 jstl 과 다른점은 if 와 else 가 있다	라는정도
+	%>
+	<!-- Write 종류 구분 ( reply/게시판write/modify -->
+	<s:if test="reply">
+		<form action="replyAction.action" method="post"
+			enctype="multipart/form-data" onsubmit="return validation();">
+			<s:hidden name="ref" value="%{resultClass.ref}" />
+			<s:hidden name="re_level" value="%{resultClass.re_level}" />
+			<s:hidden name="re_step" value="%{resultClass.re_step}" />
+	</s:if>
 
-	<s:if test="resultClass == NULL">
+	<s:elseif test="resultClass == NULL">
 		<form action="writeAction.action" method="post"
 			enctype="multipart/form-data" onsubmit="return validation();">
-	</s:if>
+	</s:elseif>
 
 	<s:else>
 		<form action="modifyAction.action" method="post"
